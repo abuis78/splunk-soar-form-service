@@ -1,7 +1,8 @@
 [project]
 name = "soar-form-service-app"
-version = "1.0.0"
+version = "1.0.1"
 description = "Splunk SOAR connector app for the external single-use form service"
+license = "Apache-2.0"
 requires-python = ">=3.11"
 dependencies = []
 
