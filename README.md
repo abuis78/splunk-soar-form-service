@@ -228,8 +228,9 @@ scripts/package.sh                             # builds and lists the TAR
 
 | Version | Date | Change |
 |---|---|---|
+| 1.0.1 | 2026-11-19 | License: Apache 2.0 (LICENSE, manifest, README) |
 | 1.0.0 | 2026-11-19 | First public release: test connectivity, create form link, get link status, revoke link, list forms; form service and AWS deployment example |
 
 ## License
 
-Copyright 2026 Andreas Buis. All rights reserved unless a `LICENSE` file states otherwise.
+Copyright 2026 Andreas Buis. Licensed under the [Apache License, Version 2.0](LICENSE).
