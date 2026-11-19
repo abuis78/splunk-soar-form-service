@@ -1,0 +1,6 @@
+*.pyc
+__pycache__/
+.ruff_cache/
+releases/*
+!releases/.gitkeep
+.DS_Store

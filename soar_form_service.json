@@ -1,0 +1,427 @@
+{
+    "appid": "45765440-2f73-4a13-8d1a-abdc59074215",
+    "name": "Form Service",
+    "description": "Creates single-use magic links to external forms with file upload and tracks their status",
+    "publisher": "Andreas Buis",
+    "package_name": "phantom_soar_form_service",
+    "type": "information",
+    "license": "Copyright 2026 Andreas Buis",
+    "app_version": "1.0.0",
+    "product_vendor": "Custom",
+    "product_name": "Form Service",
+    "product_version_regex": ".*",
+    "min_phantom_version": "6.0.0",
+    "python_version": "3.13",
+    "main_module": "soar_form_service_connector.py",
+    "logo": "soar_form_service.svg",
+    "logo_dark": "soar_form_service_dark.svg",
+    "contributors": [
+        {
+            "name": "Andreas Buis"
+        },
+        {
+            "name": "Created with Claude, model claude-opus-5-5"
+        }
+    ],
+    "configuration": {
+        "base_url": {
+            "description": "Base URL of the form service (e.g. https://forms.example.com)",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "api_key": {
+            "description": "API key of the form service (FORM_API_KEY), sent as Bearer token",
+            "data_type": "password",
+            "required": true,
+            "order": 1
+        },
+        "verify_server_cert": {
+            "description": "Verify the TLS certificate of the form service",
+            "data_type": "boolean",
+            "required": false,
+            "default": true,
+            "order": 2
+        },
+        "timeout": {
+            "description": "Request timeout in seconds",
+            "data_type": "numeric",
+            "required": false,
+            "default": 30,
+            "order": 3
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Checks that the form service is reachable and the API key is accepted",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create form link",
+            "identifier": "create_form_link",
+            "description": "Create a single-use magic link to a form; the response is added to the container as an artifact",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "form": {
+                    "description": "Form name (see 'list forms')",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                },
+                "container_id": {
+                    "description": "Container that receives the response (default: current container)",
+                    "data_type": "numeric",
+                    "required": false,
+                    "order": 1
+                },
+                "ttl_minutes": {
+                    "description": "Link lifetime in minutes (default: service default, 24 h)",
+                    "data_type": "numeric",
+                    "required": false,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.form",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.container_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.ttl_minutes",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.link_id",
+                    "data_type": "string",
+                    "column_name": "Link ID",
+                    "column_order": 0,
+                    "contains": [
+                        "form link id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.url",
+                    "data_type": "string",
+                    "column_name": "URL",
+                    "column_order": 1,
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.expires_at",
+                    "data_type": "numeric",
+                    "column_name": "Expires At",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.form",
+                    "data_type": "string",
+                    "column_name": "Form",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.container_id",
+                    "data_type": "numeric",
+                    "column_name": "Container",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.summary.link_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get link status",
+            "identifier": "get_link_status",
+            "description": "Get the status of a form link (open, claimed, used, revoked, expired)",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "link_id": {
+                    "description": "Link ID returned by 'create form link'",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "form link id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.link_id",
+                    "data_type": "string",
+                    "contains": [
+                        "form link id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.link_id",
+                    "data_type": "string",
+                    "column_name": "Link ID",
+                    "column_order": 0,
+                    "contains": [
+                        "form link id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.form",
+                    "data_type": "string",
+                    "column_name": "Form",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.container_id",
+                    "data_type": "numeric",
+                    "column_name": "Container",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.created_at",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.expires_at",
+                    "data_type": "numeric",
+                    "column_name": "Expires At",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.used_at",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "revoke link",
+            "identifier": "revoke_link",
+            "description": "Revoke an open form link; used links keep their status",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "link_id": {
+                    "description": "Link ID returned by 'create form link'",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "form link id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.link_id",
+                    "data_type": "string",
+                    "contains": [
+                        "form link id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.link_id",
+                    "data_type": "string",
+                    "column_name": "Link ID",
+                    "column_order": 0,
+                    "contains": [
+                        "form link id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.form",
+                    "data_type": "string",
+                    "column_name": "Form",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.container_id",
+                    "data_type": "numeric",
+                    "column_name": "Container",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.created_at",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.expires_at",
+                    "data_type": "numeric",
+                    "column_name": "Expires At",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.used_at",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list forms",
+            "identifier": "list_forms",
+            "description": "List the forms the service offers, with their fields",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.title",
+                    "data_type": "string",
+                    "column_name": "Title",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.fields.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.fields.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.fields.*.required",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.summary.total_forms",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}

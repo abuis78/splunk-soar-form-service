@@ -1,0 +1,14 @@
+{
+  "title": "Sicherheitsvorfall: Angaben und Beweisdatei",
+  "description": "Bitte beschreibe kurz, was passiert ist, und lade die Datei hoch (z. B. die verdächtige E-Mail als .eml).",
+  "label": "form_response",
+  "fields": [
+    {"name": "reporter_name", "label": "Dein Name", "type": "text", "required": true},
+    {"name": "reporter_email", "label": "Deine E-Mail", "type": "email", "required": true},
+    {"name": "category", "label": "Art des Vorfalls", "type": "select", "required": true,
+     "options": ["Phishing", "Malware", "Datenabfluss", "Sonstiges"]},
+    {"name": "details", "label": "Was ist passiert?", "type": "textarea", "max_length": 4000},
+    {"name": "evidence", "label": "Beweisdatei", "type": "file", "required": true,
+     "accept": ".eml,.msg,.pdf,.png,.jpg,.txt,.zip"}
+  ]
+}
